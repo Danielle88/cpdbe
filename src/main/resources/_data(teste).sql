@@ -1,0 +1,1 @@
+INSERT INTO task (title, description, scrore) VALUES ('BD', 'Modelar o banco de dados', 150);

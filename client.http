@@ -1,0 +1,27 @@
+# Listar todos
+GET http://localhost:8080/api/task
+#Authorization: Basic user f694a7b8-a34b-41d4-a59b-f7cc092986c5
+
+###
+
+# Pegar a task pelo id
+GET http://localhost:8080/api/task/1
+
+###
+
+# Apagar
+DELETE http://localhost:8080/api/task/1
+
+###
+
+#Cadastrar
+POST http://localhost:8080/api/task
+Content-Type: application/json
+Authorization: Basic joao@gmail.com 123
+
+{
+  "title": "BD",
+  "description": "Modelar as tabelas do banco de dados",
+  "score": null,
+  "status": null
+}
