@@ -6,13 +6,12 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,21 +31,22 @@ public class UserController {
     @Autowired
     private UserService service;
     
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @GetMapping
-    @Cacheable("user")
     public Page<User> index( @PageableDefault(size = 10, sort = "name") Pageable pageable){
         return service.listAll(pageable);
     }
 
     @PostMapping
-    @CacheEvict(value="users", allEntries = true)
     public ResponseEntity<User> create(@RequestBody @Valid User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         service.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @DeleteMapping("{id}")
-    @CacheEvict(value="users", allEntries = true)
     public ResponseEntity<Object> destroy(@PathVariable Long id){
         Optional<User> optional = service.getById(id);
 
@@ -59,24 +59,22 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    @Cacheable("user")
     public ResponseEntity<User> show(@PathVariable Long id){
         return ResponseEntity.of( service.getById(id) );   
     }
 
 
     @PutMapping("{id}")
-    @CacheEvict(value="users", allEntries = true)
     public ResponseEntity<User> update(@PathVariable Long id, @RequestBody @Valid User newUser){
         Optional<User> optional = service.getById(id);
 
         if (optional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         var user = optional.get();
-        String password = user.getPassword();
-        BeanUtils.copyProperties(newUser, user);
-        user.setId(id);
-        user.setPassword(password);
+        //String password = user.getPassword();   //não ta passando esses dois campos (então pega o antigo, do user msm)
+        BeanUtils.copyProperties(newUser, user, new String [] {"id", "password"});
+        //user.setId(id);
+        //user.setPassword(password);
 
         service.save(user);
 
