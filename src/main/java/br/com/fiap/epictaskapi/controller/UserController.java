@@ -73,8 +73,10 @@ public class UserController {
         if (optional.isEmpty()) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         var user = optional.get();
+        String password = user.getPassword();
         BeanUtils.copyProperties(newUser, user);
         user.setId(id);
+        user.setPassword(password);
 
         service.save(user);
 

@@ -5,16 +5,23 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 
 import org.springframework.util.Assert;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "TB_USER")
 public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
+    @Email
     private String email;
+    
+    @JsonIgnore()
     private String password;
 
     public User name(String name){
@@ -52,6 +59,11 @@ public class User {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
     }
 
     
