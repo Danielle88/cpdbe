@@ -14,6 +14,8 @@ import org.springframework.util.Assert;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
+import br.com.fiap.epictaskapi.dto.UserDto;
+
 @Entity
 @Table(name = "TB_USER")
 public class User {
@@ -44,6 +46,10 @@ public class User {
         Assert.notNull(email, "email is required");
         this.email= email;
         return this;
+    }
+
+    public UserDto toDto(){
+        return new UserDto(id, name, email);
     }
 
     public String getName() {
