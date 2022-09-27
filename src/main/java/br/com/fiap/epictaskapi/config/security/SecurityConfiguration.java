@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -16,11 +17,25 @@ public class SecurityConfiguration {
         http.httpBasic()
             .and()
             .authorizeHttpRequests()
+                //Tarefas
                 .antMatchers(HttpMethod.GET, "/api/task/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/task/").authenticated()
+
+                //Usuários
+                .antMatchers(HttpMethod.GET, "/api/user/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user/").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/api/user/**").authenticated()
+                .antMatchers(HttpMethod.PUT, "/api/user/**").authenticated()
+
+                .antMatchers("/h2-console/**").permitAll()
+                
+
                 .anyRequest().denyAll()
             .and()
                 .csrf().disable() //api não guarda a sessão (login do usuario), por isso nao preciso de chave token(que o csrf obriga) para validar que o usuario é ele mesmo.
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+                .headers().frameOptions().disable()
         ;
 
         return http.build();
