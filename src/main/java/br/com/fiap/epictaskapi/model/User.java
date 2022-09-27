@@ -1,14 +1,21 @@
 package br.com.fiap.epictaskapi.model;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +25,7 @@ import br.com.fiap.epictaskapi.dto.UserDto;
 
 @Entity
 @Table(name = "TB_USER")
-public class User {
+public class User implements UserDetails{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +36,10 @@ public class User {
     @Size(min = 8)
     @JsonProperty(access = Access.WRITE_ONLY) //usuário só escreve, não lê a senha
     private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<Role> roles;
+
 
     public User name(String name){
         Assert.notNull(name, "name is required");
@@ -52,6 +63,13 @@ public class User {
         return new UserDto(id, name, email);
     }
 
+    public List<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<Role> roles) {
+        this.roles = roles;
+    }
     public String getName() {
         return name;
     }
@@ -74,6 +92,36 @@ public class User {
         return id;
     }
     public void setId(Long id) {
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 
     
